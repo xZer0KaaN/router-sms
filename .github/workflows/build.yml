@@ -30,6 +30,10 @@ jobs:
           echo "android.useAndroidX=true" > gradle.properties
           echo "org.gradle.jvmargs=-Xmx2048m" >> gradle.properties
           find . -type f | sort
+      - name: Bildprogramm installieren
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
       - name: App-Symbol einbauen
         run: |
           ICON=$(ls *.png *.jpg *.jpeg 2>/dev/null | head -n1)
