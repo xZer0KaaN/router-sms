@@ -12,11 +12,24 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.7"
-      - name: Properties anlegen
+      - name: Dateien ordnen
         working-directory: .github/workflows
         run: |
+          mkdir -p app/src/main/java/com/example/routersms
+          M=$(find . -name AndroidManifest.xml | head -n1)
+          if [ -n "$M" ] && [ "$M" != "./app/src/main/AndroidManifest.xml" ]; then
+            mv "$M" app/src/main/AndroidManifest.xml
+          fi
+          for f in MainActivity.kt PollService.kt; do
+            P=$(find . -name "$f" | head -n1)
+            D="./app/src/main/java/com/example/routersms/$f"
+            if [ -n "$P" ] && [ "$P" != "$D" ]; then
+              mv "$P" "$D"
+            fi
+          done
           echo "android.useAndroidX=true" > gradle.properties
           echo "org.gradle.jvmargs=-Xmx2048m" >> gradle.properties
+          find . -type f | sort
       - name: Bauen
         working-directory: .github/workflows
         run: gradle assembleDebug --no-daemon
