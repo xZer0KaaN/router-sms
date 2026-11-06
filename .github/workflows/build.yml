@@ -30,6 +30,20 @@ jobs:
           echo "android.useAndroidX=true" > gradle.properties
           echo "org.gradle.jvmargs=-Xmx2048m" >> gradle.properties
           find . -type f | sort
+      - name: App-Symbol einbauen
+        run: |
+          ICON=$(ls *.png *.jpg *.jpeg 2>/dev/null | head -n1)
+          echo "Symbol: $ICON"
+          if [ -n "$ICON" ]; then
+            D=.github/workflows/app/src/main/res/mipmap-xxxhdpi
+            mkdir -p "$D"
+            if command -v magick >/dev/null 2>&1; then
+              magick "$ICON" -resize 192x192^ -gravity center -extent 192x192 "$D/ic_launcher.png"
+            else
+              convert "$ICON" -resize 192x192^ -gravity center -extent 192x192 "$D/ic_launcher.png"
+            fi
+            sed -i 's|android:label="Router SMS"|android:icon="@mipmap/ic_launcher" android:label="Router SMS"|' .github/workflows/app/src/main/AndroidManifest.xml
+          fi
       - name: Bauen
         working-directory: .github/workflows
         run: gradle assembleDebug --no-daemon
