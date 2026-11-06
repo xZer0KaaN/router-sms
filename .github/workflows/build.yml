@@ -12,8 +12,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.7"
-      - run: gradle assembleDebug --no-daemon
+      - name: Properties anlegen
+        working-directory: .github/workflows
+        run: |
+          echo "android.useAndroidX=true" > gradle.properties
+          echo "org.gradle.jvmargs=-Xmx2048m" >> gradle.properties
+      - name: Bauen
+        working-directory: .github/workflows
+        run: gradle assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: router-sms-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: .github/workflows/app/build/outputs/apk/debug/app-debug.apk
